@@ -1,0 +1,28 @@
+﻿@model ProductManager.Models.Entities.Produto
+
+@{
+    ViewData["Title"] = "Excluir Produto";
+    Layout = "_Layout";
+}
+
+<div class="container mt-4">
+    <h1>@ViewData["Title"]</h1>
+    <h4>Excluir Produto</h4>
+    <hr>
+
+    <div class="alert alert-danger" role="alert">
+        <strong>Atenção!</strong> Você está prestes a excluir o produto <strong>@Model.Nome</strong>.
+        Esta ação não pode ser desfeita.
+    </div>
+
+    <form asp-action="Delete" method="post">
+        @Html.AntiForgeryToken()
+
+        <input type="hidden" name="Id" value="@Model.Id" />
+
+        <div class="d-flex justify-content-between">
+            <button type="submit" class="btn btn-danger">Excluir</button>
+            <a href="@Url.Action("Index", "Produto")" class="btn btn-secondary">Cancelar</a>
+        </div>
+    </form>
+</div>

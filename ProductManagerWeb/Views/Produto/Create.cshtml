@@ -1,0 +1,54 @@
+﻿@model ProductManager.Models.Entities.Produto
+
+@{
+    ViewData["Title"] = "Criar Produto";
+    Layout = "_Layout";
+}
+
+<div class="container mt-4">
+    <h1>@ViewData["Title"]</h1>
+    <h4>Cadastro de Produto</h4>
+    <hr>
+
+    <!-- Formulário -->
+    <form asp-action="Create" method="post" class="needs-validation" novalidate>
+        @Html.AntiForgeryToken()
+
+        <div class="row">
+            <!-- Nome -->
+            <div class="col-md-6 mb-3">
+                <label asp-for="Nome" class="form-label"></label> <!-- Usa asp-for para pegar o display name -->
+                <input asp-for="Nome" class="form-control" maxlength="100" />
+                <span asp-validation-for="Nome" class="text-danger"></span> <!-- Mantém para exibir o erro -->
+            </div>
+
+            <!-- Preço -->
+            <div class="col-md-6 mb-3">
+                <label for="Preco" class="form-label">Preço</label>
+                <input type="text" class="form-control text-end" id="Preco" name="Preco"
+                       value="@Model.Preco.ToString("N2", System.Globalization.CultureInfo.GetCultureInfo("pt-BR"))" />
+                <span asp-validation-for="Preco" class="text-danger"></span>
+            </div>
+        </div>
+
+        <!-- Descrição -->
+        <div class="mb-3">
+            <label for="Descricao" class="form-label">Descrição</label>
+            <textarea class="form-control" id="Descricao" name="Descricao">@Model.Descricao</textarea>
+            <span asp-validation-for="Descricao" class="text-danger"></span>
+        </div>
+
+        <!-- Botões -->
+        <div class="d-flex justify-content-between">
+            <button type="submit" class="btn btn-primary">Salvar</button>
+            <a href="@Url.Action("Index", "Produto")" class="btn btn-secondary">Cancelar</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
+

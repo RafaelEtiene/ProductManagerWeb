@@ -1,27 +1,61 @@
-var builder = WebApplication.CreateBuilder(args);
+using FluentMigrator.Runner;
+using FluentValidation;
+using FluentValidation.AspNetCore;
+using Microsoft.EntityFrameworkCore;
+using ProductManager.Data;
+using ProductManager.Data.Migrations;
+using ProductManager.Models.Entities;
+using ProductManager.Models.Validator;
+using ProductManager.Repositories;
+using ProductManager.Services;
+using System;
+using System.Globalization;
 
-// Add services to the container.
-builder.Services.AddControllersWithViews();
+var builder = WebApplication.CreateBuilder(args);
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+builder.Services.AddFluentMigratorCore()
+    .ConfigureRunner(runner => runner
+        .AddPostgres() // Usando PostgreSQL como banco de dados
+        .WithGlobalConnectionString(builder.Configuration.GetConnectionString("DefaultConnection")) // Connection string do PostgreSQL
+        .ScanIn(typeof(CreateProdutoTable).Assembly).For.Migrations() // Escaneia a assembly para migrações
+    )
+    .AddLogging(logging => logging.AddConsole()); // Adiciona o log para ver o progresso das migrações no console
+
+
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseNpgsql(connectionString));
+
+builder.Services.AddScoped<IProdutoService, ProdutoService>();
+builder.Services.AddScoped<IProdutoRepository, ProdutoRepository>();
+
+// Configura o MVC com suporte para FluentValidation
+builder.Services.AddControllersWithViews()
+        .AddFluentValidation(config =>
+        {
+            config.RegisterValidatorsFromAssemblyContaining<Program>(); // Ou de algum assembly específico
+        });
+
+builder.Services.AddFluentValidationClientsideAdapters();
+
+builder.Services.AddScoped<IValidator<Produto>, ProdutoValidator>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
+using (var scope = app.Services.CreateScope())
 {
-    app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseHsts();
+    var runner = scope.ServiceProvider.GetRequiredService<IMigrationRunner>();
+    runner.MigrateUp();
 }
 
-app.UseHttpsRedirection();
+if (!app.Environment.IsDevelopment())
+    app.UseExceptionHandler("/Home/Error");
+
 app.UseStaticFiles();
-
 app.UseRouting();
-
 app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
-
+    pattern: "{controller=Produto}/{action=Index}/{id?}");
 app.Run();
