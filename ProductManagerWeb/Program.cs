@@ -40,6 +40,11 @@ builder.Services.AddFluentValidationClientsideAdapters();
 
 builder.Services.AddScoped<IValidator<Produto>, ProdutoValidator>();
 
+var cultureInfo = new CultureInfo("pt-BR");
+
+CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
+CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
+
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())

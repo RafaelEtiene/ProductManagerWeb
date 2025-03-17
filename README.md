@@ -62,14 +62,9 @@ Produto Manager é uma aplicação web que permite aos usuários gerenciar infor
 	docker login
 	
 2. Rodar container PostgreSql
-	docker run --name pgsql-productmanager -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=productmanagerdb -p 5432:5432 -d postgres:15-alpine
+   docker run --name pgsql-productmanager -e POSTGRES_USER=userTest -e POSTGRES_PASSWORD=test -e POSTGRES_DB=productmanagerdb -p 5432:5432 -v postgres_data:/var/lib/postgresql/data -d postgres:latest
+
 	
-3. Rodar a aplicação com PostgreSql
-	docker run --name productmanager-app -p 8080:80 --link pgsql-productmanager -e ConnectionStrings__DefaultConnection="Host=pgsql-productmanager;Port=5432;Database=productmanagerdb;Username=postgres;Password=postgres;" -d rafaeletiene22/productmanager:v1.0
-
-
-bash
-Copy
-Edit
-docker run -d -p 80:80 rafiusk/myapp:v1.0
+3. Rodar a aplicação com PostgreSql 
+	docker run --name productmanager-app -p 8080:8080 --link pgsql-productmanager -e ConnectionStrings__DefaultConnection="Host=pgsql-productmanager;Port=5432;Database=productmanagerdb;Username=userTest;Password=test;" -d rafaeletiene22/productmanager:v1.2
 
